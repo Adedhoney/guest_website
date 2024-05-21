@@ -1,14 +1,25 @@
 import { IDatabase } from '@infrastructure/Database';
-import { Post, User } from '../Model';
+import { OTP, Post, User } from '../Model';
 
 export interface IAccountRepository {
     readonly db: IDatabase;
     saveUser(user: User): Promise<void>;
-    getUser(userId: string): Promise<User>;
+    getUserById(userId: string): Promise<User>;
+    getUserByEmail(email: string): Promise<User>;
+    userNameAvalable(userName: string): Promise<boolean>;
+
     getUsers(): Promise<User[]>;
     deleteUser(userId: string): Promise<void>;
     updateUser(user: User): Promise<void>;
-    updatePassword(userId: string, password: string): Promise<void>;
+    updatePassword(
+        userId: string,
+        password: string,
+        date: string,
+    ): Promise<void>;
+
+    saveOTP(email: string, otp: string, expiry: string): Promise<void>;
+    getOTP(email: string, otp: string): Promise<OTP>;
+    deleteOTP(email: string): Promise<void>;
 }
 
 export class AccountRepository implements IAccountRepository {
@@ -22,11 +33,26 @@ export class AccountRepository implements IAccountRepository {
         await this.database.collection<User>('users').insertOne(user);
     }
 
-    async getUser(userId: string): Promise<User> {
+    async getUserById(userId: string): Promise<User> {
         const user = await this.database
             .collection<User>('users')
             .findOne({ userId });
         return user as User;
+    }
+    async getUserByEmail(email: string): Promise<User> {
+        const user = await this.database
+            .collection<User>('users')
+            .findOne({ email });
+        return user as User;
+    }
+    async userNameAvalable(userName: string): Promise<boolean> {
+        const user = await this.database
+            .collection<User>('users')
+            .findOne({ userName });
+        if (user) {
+            return false;
+        }
+        return true;
     }
 
     async getUsers(): Promise<User[]> {
@@ -61,9 +87,30 @@ export class AccountRepository implements IAccountRepository {
             .updateOne({ userId: user.userId }, user);
     }
 
-    async updatePassword(userId: string, password: string): Promise<void> {
+    async updatePassword(
+        userId: string,
+        password: string,
+        date: string,
+    ): Promise<void> {
         await this.database
             .collection<User>('users')
-            .updateOne({ userId }, { password });
+            .updateOne({ userId }, { password, lastModifiedOn: date });
+    }
+
+    async saveOTP(email: string, otp: string, expiry: string): Promise<void> {
+        await this.database
+            .collection<OTP>('otps')
+            .insertOne({ email, otp, expiry });
+    }
+
+    async getOTP(email: string, otp: string): Promise<OTP> {
+        const otpInfo = await this.database
+            .collection<OTP>('otps')
+            .findOne({ email, otp });
+        return otpInfo as OTP;
+    }
+
+    async deleteOTP(email: string): Promise<void> {
+        await this.database.collection<OTP>('otps').deleteOne({ email });
     }
 }

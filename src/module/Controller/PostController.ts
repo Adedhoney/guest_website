@@ -15,7 +15,7 @@ export class PostController {
         next: NextFunction,
     ) => {
         try {
-            const postInfo = await this.service.savePost(
+            const postInfo = await this.service.SavePost(
                 req.body.data,
                 res.locals.authData,
             );

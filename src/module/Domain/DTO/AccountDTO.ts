@@ -11,6 +11,19 @@ export interface LogInDTO {
     password: string;
 }
 export interface UpdateInfoDTO {
-    email: string;
+    userName?: string;
+    firstName?: string;
+    lastName?: string;
+}
+export interface UpdatePassWordDTO {
     password: string;
+}
+
+export interface verifyOtpDTO {
+    email: string;
+    otp: string;
+}
+export interface resetPasswordDTO {
+    otpToken: string;
+    newPassword: string;
 }

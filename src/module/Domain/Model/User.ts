@@ -5,15 +5,20 @@ export interface User {
     email: string;
     firstName: string;
     lastName: string;
-    password: string;
+    password?: string;
     isAdmin: boolean;
     status: string;
-    createdOn: string;
-    lastModifiedOn: string;
-    createdBy: string;
-    modifiedBy: string;
+    createdOn?: string;
+    lastModifiedOn?: string;
+    createdBy?: string;
+    modifiedBy?: string;
 }
 
+export interface OTP {
+    email: string;
+    otp: string;
+    expiry: string;
+}
 export enum UserStatus {
     BANNED = 'BANNED',
     ACTIVE = 'ACTIVE',
