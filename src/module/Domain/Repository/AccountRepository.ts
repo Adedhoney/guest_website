@@ -1,12 +1,14 @@
 import { IDatabase } from '@infrastructure/Database';
-import { OTP, Post, User } from '../Model';
+import { OTP, Post, User, UserStatus } from '../Model';
 
 export interface IAccountRepository {
     readonly db: IDatabase;
     saveUser(user: User): Promise<void>;
     getUserById(userId: string): Promise<User>;
     getUserByEmail(email: string): Promise<User>;
+    getUserByUserName(email: string): Promise<User>;
     userNameAvalable(userName: string): Promise<boolean>;
+    BanUser(userId: string): Promise<void>;
 
     getUsers(): Promise<User[]>;
     deleteUser(userId: string): Promise<void>;
@@ -45,6 +47,12 @@ export class AccountRepository implements IAccountRepository {
             .findOne({ email });
         return user as User;
     }
+    async getUserByUserName(userName: string): Promise<User> {
+        const user = await this.database
+            .collection<User>('users')
+            .findOne({ userName });
+        return user as User;
+    }
     async userNameAvalable(userName: string): Promise<boolean> {
         const user = await this.database
             .collection<User>('users')
@@ -61,6 +69,12 @@ export class AccountRepository implements IAccountRepository {
             .find({})
             .toArray();
         return users as User[];
+    }
+
+    async BanUser(userId: string): Promise<void> {
+        await this.database
+            .collection<User>('users')
+            .updateOne({ userId }, { status: UserStatus.BANNED });
     }
 
     async deleteUser(userId: string): Promise<void> {
@@ -111,6 +125,6 @@ export class AccountRepository implements IAccountRepository {
     }
 
     async deleteOTP(email: string): Promise<void> {
-        await this.database.collection<OTP>('otps').deleteOne({ email });
+        await this.database.collection<OTP>('otps').deleteMany({ email });
     }
 }

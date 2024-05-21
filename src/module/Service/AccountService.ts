@@ -15,8 +15,8 @@ import {
     SignUpDTO,
     UpdateInfoDTO,
     UpdatePassWordDTO,
-    resetPasswordDTO,
-    verifyOtpDTO,
+    ResetPasswordDTO,
+    VerifyOtpDTO,
 } from '@module/Domain/DTO';
 import { User, UserStatus } from '@module/Domain/Model';
 import { IAccountRepository } from '@module/Domain/Repository';
@@ -24,11 +24,13 @@ import { IAccountRepository } from '@module/Domain/Repository';
 export interface IAccountService {
     SignUp(data: SignUpDTO): Promise<void>;
     LogIn(data: LogInDTO): Promise<{ token: string; user: User }>;
+    GetUser(userId: string): Promise<User>;
     UpdateInfo(data: UpdateInfoDTO, userId: string): Promise<User>;
     UpdatePassword(data: UpdatePassWordDTO, userId: string): Promise<void>;
     DeleteUser(userId: string): Promise<void>;
     ForgotPassword(email: string): Promise<void>;
-    VerifyOTP(data: verifyOtpDTO): Promise<{ token: string }>;
+    VerifyOTP(data: VerifyOtpDTO): Promise<{ token: string }>;
+    ResetPassword(data: ResetPasswordDTO): Promise<void>;
 }
 
 export class AccountService implements IAccountService {
@@ -91,6 +93,14 @@ export class AccountService implements IAccountService {
         return { token, user };
     }
 
+    async GetUser(userId: string): Promise<User> {
+        const user = await this.acctrepo.getUserById(userId);
+        if (!user) {
+            throw new CustomError('User not found', StatusCode.UNAUTHORIZED);
+        }
+        return user;
+    }
+
     async UpdateInfo(data: UpdateInfoDTO, userId: string): Promise<User> {
         const userInfo = await this.acctrepo.getUserById(userId);
         if (!userInfo) {
@@ -144,12 +154,13 @@ export class AccountService implements IAccountService {
         const otp = generateRandomOTP();
         const expiry = getCurrentTimeStamp() + 600; // expires in 10 minutes
 
-        this.acctrepo.saveOTP(email, otp, expiry);
+        await this.acctrepo.deleteOTP(email);
+        await this.acctrepo.saveOTP(email, otp, expiry);
 
         // add send email option
     }
 
-    async VerifyOTP(data: verifyOtpDTO): Promise<{ token: string }> {
+    async VerifyOTP(data: VerifyOtpDTO): Promise<{ token: string }> {
         const savedOtp = await this.acctrepo.getOTP(data.email, data.otp);
         const date = getCurrentTimeStamp();
         if (!savedOtp || savedOtp.otp !== data.otp || date > savedOtp.expiry)
@@ -159,12 +170,16 @@ export class AccountService implements IAccountService {
         return { token };
     }
 
-    public async ResetPassword(data: resetPasswordDTO): Promise<void> {
+    public async ResetPassword(data: ResetPasswordDTO): Promise<void> {
         const { email } = verifyOtpToken(data.otpToken);
         if (!email) {
             throw new CustomError('Token invalid or expired');
         }
         const user = await this.acctrepo.getUserByEmail(email);
+
+        if (!user) {
+            throw new CustomError('User not found', StatusCode.UNAUTHORIZED);
+        }
 
         const date = getCurrentTimeStamp();
 

@@ -19,11 +19,11 @@ export interface UpdatePassWordDTO {
     password: string;
 }
 
-export interface verifyOtpDTO {
+export interface VerifyOtpDTO {
     email: string;
     otp: string;
 }
-export interface resetPasswordDTO {
+export interface ResetPasswordDTO {
     otpToken: string;
     newPassword: string;
 }
