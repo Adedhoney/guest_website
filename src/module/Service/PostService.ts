@@ -4,7 +4,7 @@ import { Post, PostStatus, User } from '@module/Domain/Model';
 import { IAccountRepository, IPostRepository } from '@module/Domain/Repository';
 
 export interface IPostService {
-    SavePost(data: SavePostDTO, user: User): Promise<Post>;
+    SavePost(data: SavePostDTO, authUser?: User): Promise<Post>;
     DeletePost(postId: string, authUser: User): Promise<void>;
     GetPost(postId: string): Promise<Post>;
     GetPosts(userName: string): Promise<Post>;

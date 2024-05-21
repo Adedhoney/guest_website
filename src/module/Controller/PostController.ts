@@ -1,12 +1,17 @@
 import { IBaseRequest } from '@application/Request/Request';
-import { successResponse } from '@application/Utils';
+import { successResponse, verifyAuthToken } from '@application/Utils';
 import { SavePostDTO } from '@module/Domain/DTO';
+import { IAccountRepository } from '@module/Domain/Repository';
 import { IPostService } from '@module/Service';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 
 export class PostController {
-    constructor(private service: IPostService) {
+    constructor(
+        private service: IPostService,
+        private acctrepo: IAccountRepository,
+    ) {
         this.service = service;
+        this.acctrepo = acctrepo;
     }
 
     savePost: RequestHandler = async (
@@ -15,10 +20,31 @@ export class PostController {
         next: NextFunction,
     ) => {
         try {
-            const post = await this.service.SavePost(
-                req.body.data,
-                res.locals.authData,
-            );
+            const token = req.headers['authorization']?.split(' ')[1] as string;
+            if (!token) {
+                const post = await this.service.SavePost(req.body.data);
+
+                return successResponse(res, 'Post saved Successfully', {
+                    post,
+                });
+            }
+            const validate = verifyAuthToken(token);
+            if (!validate.userId) {
+                const post = await this.service.SavePost(req.body.data);
+
+                return successResponse(res, 'Post saved Successfully', {
+                    post,
+                });
+            }
+            const authData = await this.acctrepo.getUserById(validate.userId);
+            if (!authData) {
+                const post = await this.service.SavePost(req.body.data);
+
+                return successResponse(res, 'Post saved Successfully', {
+                    post,
+                });
+            }
+            const post = await this.service.SavePost(req.body.data, authData);
 
             return successResponse(res, 'Post saved Successfully', {
                 post,
