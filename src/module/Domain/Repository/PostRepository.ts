@@ -6,7 +6,7 @@ export interface IPostRepository {
     savePost(post: Post): Promise<void>;
     deletePost(postId: string, date: string, modifier: string): Promise<void>;
     getPost(postId: string): Promise<Post>;
-    getPosts(postId: string): Promise<Post[]>;
+    getPosts(userId?: string): Promise<Post[]>;
 }
 
 export class PostRepository implements IPostRepository {
@@ -30,7 +30,7 @@ export class PostRepository implements IPostRepository {
     async getPosts(userId?: string): Promise<Post[]> {
         const query: any = {};
         if (userId) {
-            query[userId] = userId;
+            query.userId = userId;
         }
         const posts = await this.database
             .collection<Post>('posts')
@@ -47,10 +47,12 @@ export class PostRepository implements IPostRepository {
         await this.database.collection<Post>('posts').updateOne(
             { postId },
             {
-                post: '',
-                status: PostStatus.DELETED,
-                lastModifiedOn: date,
-                modifiedBy: modifier,
+                $set: {
+                    post: '',
+                    status: PostStatus.DELETED,
+                    lastModifiedOn: date,
+                    modifiedBy: modifier,
+                },
             },
         );
     }

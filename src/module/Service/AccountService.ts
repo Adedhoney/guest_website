@@ -41,7 +41,7 @@ export class AccountService implements IAccountService {
     async SignUp(data: SignUpDTO): Promise<void> {
         const emailExists = await this.acctrepo.getUserByEmail(data.email);
         if (emailExists) {
-            throw new CustomError('Acoount already exists, Log in instead.');
+            throw new CustomError('Account already exists, Log in instead.');
         }
 
         const userNameAvailable = await this.acctrepo.userNameAvalable(
@@ -49,7 +49,7 @@ export class AccountService implements IAccountService {
         );
         if (!userNameAvailable) {
             throw new CustomError(
-                'User already exists, Choose a unique username.',
+                'UserName already exists, Choose a unique username.',
             );
         }
         const password = await encryptPassword(data.password);
@@ -98,6 +98,8 @@ export class AccountService implements IAccountService {
         if (!user) {
             throw new CustomError('User not found', StatusCode.UNAUTHORIZED);
         }
+
+        delete user.password;
         return user;
     }
 
@@ -130,12 +132,14 @@ export class AccountService implements IAccountService {
         userId: string,
     ): Promise<void> {
         const userInfo = await this.acctrepo.getUserById(userId);
+
+        const password = await encryptPassword(data.password);
         if (!userInfo) {
             throw new CustomError('User not found', StatusCode.UNAUTHORIZED);
         }
 
         const date = getCurrentTimeStamp();
-        await this.acctrepo.updatePassword(userId, data.password, date);
+        await this.acctrepo.updatePassword(userId, password, date);
     }
 
     async DeleteUser(userId: string): Promise<void> {
@@ -152,7 +156,7 @@ export class AccountService implements IAccountService {
         }
 
         const otp = generateRandomOTP();
-        const expiry = getCurrentTimeStamp() + 600; // expires in 10 minutes
+        const expiry = String(Number(getCurrentTimeStamp()) + 600); // expires in 10 minutes
 
         await this.acctrepo.deleteOTP(email);
         await this.acctrepo.saveOTP(email, otp, expiry);
@@ -182,7 +186,8 @@ export class AccountService implements IAccountService {
         }
 
         const date = getCurrentTimeStamp();
+        const password = await encryptPassword(data.newPassword);
 
-        await this.acctrepo.updatePassword(user.userId, data.newPassword, date);
+        await this.acctrepo.updatePassword(user.userId, password, date);
     }
 }

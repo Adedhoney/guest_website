@@ -29,7 +29,6 @@ const postctr = new PostController(
 );
 const acctctr = new AccountController(new AccountService(acctrepo));
 const adminctr = new AdminController(new AdminService(postrepo, acctrepo));
-const auth = Authentication(acctrepo);
 
 // add validations with joi, authentications and or authorizations
 
@@ -37,56 +36,60 @@ router.post('/account/signup', Validation(SignUpSchema), acctctr.signUp);
 router.post('/account/login', Validation(LogInSchema), acctctr.logIn);
 router.post(
     '/account/update-info',
-    auth,
+    Authentication(acctrepo),
     Validation(UpdateInfoSchema),
     acctctr.updateInfo,
 );
 router.post(
     '/account/update-password',
-    auth,
+    Authentication(acctrepo),
     Validation(UpdatePassWordSchema),
     acctctr.updatePassword,
 );
 
-router.get('/account', auth, acctctr.getUser);
-router.delete('/account', auth, acctctr.deleteUser);
+router.get('/account', Authentication(acctrepo), acctctr.getUser);
+router.delete('/account', Authentication(acctrepo), acctctr.deleteUser);
 
-router.post('/account/forgot-password/:email', auth, acctctr.forgotPassword);
+router.post(
+    '/account/forgot-password/:email',
+    Authentication(acctrepo),
+    acctctr.forgotPassword,
+);
 router.post(
     '/account/verify-otp',
-    auth,
+    Authentication(acctrepo),
     Validation(VerifyOtpSchema),
     acctctr.verifyOTP,
 );
 router.post(
     '/account/reset-password',
-    auth,
+    Authentication(acctrepo),
     Validation(ResetPasswordSchema),
     acctctr.resetPassword,
 );
 
 router.delete(
     '/admin/account/delete/:userId',
-    auth,
+    Authentication(acctrepo),
     Authorization,
     adminctr.deleteUser,
 );
 router.post(
     '/admin/account/ban/:userId',
-    auth,
+    Authentication(acctrepo),
     Authorization,
     adminctr.banUser,
 );
 router.delete(
     '/admin/post/delete/:postId',
-    auth,
+    Authentication(acctrepo),
     Authorization,
     adminctr.deletePost,
 );
 
 router.post('/post', Validation(SavePostSchema), postctr.savePost);
-router.get('/post/:postId', auth, postctr.getPost);
-router.get('/post', auth, postctr.getPosts);
-router.delete('/post/:postId', auth, postctr.deletePost);
+router.get('/post/:postId', Authentication(acctrepo), postctr.getPost);
+router.get('/post', Authentication(acctrepo), postctr.getPosts);
+router.delete('/post/:postId', Authentication(acctrepo), postctr.deletePost);
 
 export { router };

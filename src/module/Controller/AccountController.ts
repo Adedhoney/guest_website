@@ -50,7 +50,7 @@ export class AccountController {
         next: NextFunction,
     ) => {
         try {
-            const user = await this.service.GetUser(req.body.data);
+            const user = await this.service.GetUser(res.locals.authData.userId);
 
             return successResponse(res, 'Successful', user);
         } catch (err) {
@@ -98,7 +98,7 @@ export class AccountController {
         next: NextFunction,
     ) => {
         try {
-            await this.service.DeleteUser(req.params.userId);
+            await this.service.DeleteUser(res.locals.authData.userId);
 
             return successResponse(res, 'Successful');
         } catch (err) {

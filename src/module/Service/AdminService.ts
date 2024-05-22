@@ -18,7 +18,7 @@ export class AdminService implements IAdminService {
     }
 
     async BanUser(userId: string): Promise<void> {
-        this.acctrepo.BanUser(userId);
+        await this.acctrepo.BanUser(userId);
     }
     async DeleteUser(userId: string): Promise<void> {
         await this.acctrepo.deleteUser(userId);

@@ -7,7 +7,7 @@ export interface IPostService {
     SavePost(data: SavePostDTO, authUser?: User): Promise<Post>;
     DeletePost(postId: string, authUser: User): Promise<void>;
     GetPost(postId: string): Promise<Post>;
-    GetPosts(userName: string): Promise<Post>;
+    GetPosts(userName: string): Promise<Post[]>;
 }
 
 export class PostService implements IPostService {
@@ -26,7 +26,7 @@ export class PostService implements IPostService {
         const postInfo = {
             userId: authUser ? authUser.userId : undefined,
             postId,
-            fromGuest: authUser ? true : false,
+            fromGuest: authUser ? false : true,
             post: data.post,
             status: PostStatus.ACTIVE,
             createdOn: date,
@@ -46,10 +46,12 @@ export class PostService implements IPostService {
         const post = await this.postrepo.getPost(postId);
         return post;
     }
-    async GetPosts(userName: string): Promise<Post> {
-        const { userId } = await this.acctrepo.getUserByUserName(userName);
-        const post = await this.postrepo.getPost(userId);
-        return post;
+    async GetPosts(userName: string): Promise<Post[]> {
+        const { userId } = (await this.acctrepo.getUserByUserName(
+            userName,
+        )) || { userId: null };
+        const posts = await this.postrepo.getPosts(userId);
+        return posts;
     }
 
     async DeletePost(postId: string, authUser: User): Promise<void> {

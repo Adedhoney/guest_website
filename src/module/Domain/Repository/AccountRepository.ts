@@ -74,7 +74,7 @@ export class AccountRepository implements IAccountRepository {
     async BanUser(userId: string): Promise<void> {
         await this.database
             .collection<User>('users')
-            .updateOne({ userId }, { status: UserStatus.BANNED });
+            .updateOne({ userId }, { $set: { status: UserStatus.BANNED } });
     }
 
     async deleteUser(userId: string): Promise<void> {
@@ -98,7 +98,7 @@ export class AccountRepository implements IAccountRepository {
     async updateUser(user: User): Promise<void> {
         await this.database
             .collection<User>('users')
-            .updateOne({ userId: user.userId }, user);
+            .updateOne({ userId: user.userId }, { $set: { ...user } });
     }
 
     async updatePassword(
@@ -108,7 +108,10 @@ export class AccountRepository implements IAccountRepository {
     ): Promise<void> {
         await this.database
             .collection<User>('users')
-            .updateOne({ userId }, { password, lastModifiedOn: date });
+            .updateOne(
+                { userId },
+                { $set: { password, lastModifiedOn: date } },
+            );
     }
 
     async saveOTP(email: string, otp: string, expiry: string): Promise<void> {
