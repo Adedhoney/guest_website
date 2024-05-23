@@ -3,7 +3,15 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const envs = ['DB_URI', 'DB_NAME', 'JWT_SECRET'];
+const envs = [
+    'DB_URI',
+    'DB_NAME',
+    'JWT_SECRET',
+    'SMTP_HOST',
+    'SMTP_PORT',
+    'SMTP_USERNAME',
+    'SMTP_PASSWORD',
+];
 
 envs.forEach((value, index) => {
     if (!process.env[envs[index]]) {
@@ -21,4 +29,10 @@ export default {
         DB_NAME: process.env.DB_NAME,
     },
     JWT: { secret: process.env.JWT_SECRET },
+    SMTP: {
+        host: process.env.SMTP_HOST as string,
+        port: Number(process.env.SMTP_PORT),
+        username: process.env.SMTP_USERNAME as string,
+        password: process.env.SMTP_PASSWORD as string,
+    },
 };

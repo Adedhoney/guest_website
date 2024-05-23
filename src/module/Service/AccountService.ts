@@ -20,6 +20,7 @@ import {
 } from '@module/Domain/DTO';
 import { User, UserStatus } from '@module/Domain/Model';
 import { IAccountRepository } from '@module/Domain/Repository';
+import { AccountNotification } from '@module/Infrastructure';
 
 export interface IAccountService {
     SignUp(data: SignUpDTO): Promise<void>;
@@ -34,8 +35,12 @@ export interface IAccountService {
 }
 
 export class AccountService implements IAccountService {
-    constructor(private acctrepo: IAccountRepository) {
+    constructor(
+        private acctrepo: IAccountRepository,
+        private acctNotification: AccountNotification,
+    ) {
         this.acctrepo = acctrepo;
+        this.acctNotification = acctNotification;
     }
 
     async SignUp(data: SignUpDTO): Promise<void> {
@@ -160,8 +165,11 @@ export class AccountService implements IAccountService {
 
         await this.acctrepo.deleteOTP(email);
         await this.acctrepo.saveOTP(email, otp, expiry);
-
-        // add send email option
+        this.acctNotification.forgotPasswordEmail(
+            email,
+            otp,
+            userInfo.firstName,
+        );
     }
 
     async VerifyOTP(data: VerifyOtpDTO): Promise<{ token: string }> {
