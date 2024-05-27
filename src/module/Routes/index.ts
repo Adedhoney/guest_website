@@ -86,8 +86,8 @@ router.delete(
 );
 
 router.post('/post', Validation(SavePostSchema), postctr.savePost);
-router.get('/post/:postId', Authentication(acctrepo), postctr.getPost);
-router.get('/post', Authentication(acctrepo), postctr.getPosts);
+router.get('/post/:postId', postctr.getPost);
+router.get('/post', postctr.getPosts);
 router.delete('/post/:postId', Authentication(acctrepo), postctr.deletePost);
 
 export { router };
