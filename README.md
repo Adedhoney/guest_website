@@ -73,7 +73,7 @@ git clone https://github.com/Adedhoney/guest_website
     npm start
     ```
 
-To get a detailed view of the endpoints, go to this [postman](https://lets-blog.netlify.app/all_blogs)
+To get a detailed view of the endpoints, go to this [postman]
 
 ## API endpoints:
 
