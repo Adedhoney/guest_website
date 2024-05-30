@@ -58,6 +58,20 @@ export class AccountController {
         }
     };
 
+    getUserById: RequestHandler = async (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+    ) => {
+        try {
+            const user = await this.service.GetUser(req.params.userId);
+
+            return successResponse(res, 'Successful', user);
+        } catch (err) {
+            next(err);
+        }
+    };
+
     updateInfo: RequestHandler = async (
         req: IBaseRequest<UpdateInfoDTO>,
         res: Response,

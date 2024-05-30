@@ -52,6 +52,7 @@ router.post(
 );
 
 router.get('/account', Authentication(acctrepo), acctctr.getUser);
+router.get('/account/:userId', Authentication(acctrepo), acctctr.getUserById);
 router.delete('/account', Authentication(acctrepo), acctctr.deleteUser);
 
 router.post('/account/forgot-password/:email', acctctr.forgotPassword);
