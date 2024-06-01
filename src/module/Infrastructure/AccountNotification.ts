@@ -67,9 +67,6 @@ export class AccountNotification
                 <p style="width: 60px; height: 60px; border: 2px solid #2d75b6; border-radius: 5px; line-height: 60px; text-align: center; font-weight: bold; font-size: 22px;">${otp[2]}</p>
                 <p style="width: 60px; height: 60px; border: 2px solid #2d75b6; border-radius: 5px; line-height: 60px; text-align: center; font-weight: bold; font-size: 22px;">${otp[3]}</p>
               </div>
-              <div style="margin: 30px 0;">
-                <a href="#" style="display: inline-block; width: 100%; background-color: #2d75b6; color: #ffffff; text-decoration: none; padding: 15px 30px; border-radius: 5px; font-size: 16px; text-align: center;">Login</a>
-              </div>
               <p style="color: #23203d; font-size: 16px; line-height: 24px;">If you did not initiate this request, please ignore this email.</p>
               <p style="color: #23203d; font-size: 16px; font-weight: bold; margin: 30px 0;">Guest Team</p>
             </td>
@@ -82,11 +79,10 @@ export class AccountNotification
           <tr>
             <td align="center">
               <div style="width: 80px; height: 80px;">
-                <img alt="logo" src="https://frontendgroupdiag.blob.core.windows.net/websiteresource/tapsite/logo.png" style="width: 100%; height: 100%;" />
               </div>
               <p style="color: #23203d; font-size: 16px; line-height: 24px; margin: 5px 0 10px 0;">Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet.</p>
               <p style="color: #23203d; font-size: 16px; line-height: 24px; margin: 20px 0;">Lorem ipsum dolor sit amet.</p>
-              <p style="color: #23203d; font-size: 16px; line-height: 24px;">&copy; TAP 2021</p>
+              <p style="color: #23203d; font-size: 16px; line-height: 24px;">&copy;Guest Team</p>
             </td>
           </tr>
         </table>
